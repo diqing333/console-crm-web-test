@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOGS" value="../logs"/>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] [%X{luoshu-request-log-id}] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/console-crm.log</file>
+        <encoder>  
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [luoshuRequestId: %X{luoshu-request-log-id}] %logger - %msg%n</pattern>  
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 1000 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/console-crm-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1000MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+    
+    <appender name="RequestLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/request.log</file>
+        <encoder>  
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [luoshuRequestId: %X{luoshu-request-log-id}] %logger - %msg%n</pattern>  
+        </encoder>  
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 1000 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/request-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1000MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="AccessTraceLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/console-crm-access.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} logid[%X{luoshu-request-log-id}] module[console-crm] %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 1000 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/console-crm-access-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1000MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+    
+    <appender name="BceInternalLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/bce-internal.log</file>
+        <encoder>  
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [luoshuRequestId: %X{luoshu-request-log-id}] %logger - %msg%n</pattern>  
+        </encoder> 
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 1000 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/bce-internal-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1000MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
+    </root>
+    
+    <logger name="com.baidu.bce.internalsdk" level="info" additivity="false">
+        <appender-ref ref="BceInternalLog"/>
+    </logger>
+
+    <logger name="com.baidu.lsqm.console.web.intercepter.RequestTraceInterceptor" level="debug" additivity="false">
+        <appender-ref ref="AccessTraceLog"/>
+    </logger>
+
+    <logger name="com.baidu.lsqm.console.web.intercepter.RequestLogInterceptor" level="debug" additivity="false">
+        <appender-ref ref="RequestLog"/>
+    </logger>
+
+</configuration>
